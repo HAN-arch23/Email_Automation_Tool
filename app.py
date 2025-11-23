@@ -313,7 +313,14 @@ def seed_templates():
         db.session.add(tpl)
     db.session.commit()
     print("Seeded templates:", len(data))
+from flask_migrate import upgrade
 
-
+# Auto-run migrations on startup (only if database is empty)
+with app.app_context():
+    try:
+        upgrade()
+        print("Database upgraded successfully.")
+    except Exception as e:
+        print(f"Migration skipped or failed: {e}")
 if __name__ == "__main__":
     app.run(debug=True)
