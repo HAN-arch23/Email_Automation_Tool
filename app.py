@@ -288,7 +288,15 @@ def index():
         templates = [{"id": str(t.id), "name": t.title} for t in Template.query.order_by(Template.created_at.desc()).all()]
     else:
         js = load_templates_file()
-        templates = [{"id": t.get("id"), "name": t.get("title")} for t in js]
+
+# If js contains strings, convert them to dicts
+        templates = []
+        for t in js:
+            if isinstance(t, dict):
+                templates.append({"id": t.get("id"), "name": t.get("title")})
+        else:
+        # Fallback if t is a string
+            templates.append({"id": t, "name": t})
     return render_template("index.html", templates=templates)
 
 
