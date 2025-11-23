@@ -330,7 +330,7 @@ def seed_templates():
     for t in data:
         title = t.get("title") or t.get("id") or ""
         subject = t.get("subject") or ""
-        body = t.get("content") or t.get("body") or ""
+        body = t.get("body") or t.get("content") or ""
 
         tpl = Template(
             title=title,
