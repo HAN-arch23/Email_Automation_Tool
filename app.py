@@ -23,7 +23,7 @@ load_dotenv()
 app = Flask(__name__, template_folder="templates")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
 # DB path relative to app location: instance/app.db
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///instance/app.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # ensure instance folder exists
