@@ -207,8 +207,6 @@ def route_send():
 # -------------------------
 # Email Password (Keychain) UI
 # -------------------------
-from email_utils import get_stored_password
-
 
 @app.route("/email_password", methods=["GET", "POST"])
 @login_required
