@@ -45,13 +45,14 @@ def load_user(user_id):
 # Templates file path (relative to this file)
 TEMPLATES_PATH = os.path.join(os.path.dirname(__file__), "templates.json")
 
-
 def load_templates_file():
     try:
-        with open(TEMPLATES_PATH, "r", encoding="utf-8") as f:
+        with open("templates.json", "r") as f:
             return json.load(f)
-    except Exception:
+    except Exception as e:
+        print("Error loading templates.json:", e)
         return []
+
 
 
 # -------------------------
