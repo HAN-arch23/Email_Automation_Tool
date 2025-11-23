@@ -1,6 +1,6 @@
 services:
   - type: web
     name: Email_Automation_Tool
-    env: python
+    runtime: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn email-web.app:app"
