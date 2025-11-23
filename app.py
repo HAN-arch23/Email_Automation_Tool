@@ -315,26 +315,47 @@ def history():
 # -------------------------
 # CLI helper to seed templates
 # -------------------------
+# ------------------------------------------
+# CLI helper to seed templates
+# ------------------------------------------
 @app.cli.command("seed-templates")
 def seed_templates():
     count = Template.query.count()
     if count:
         print("Templates already present.")
         return
-    data = load_templates_file()
+
+    data = load_templates_file()  # <-- THIS defines "data"
+
     for t in data:
-        tpl = Template(title=t.get("title") or t.get("id"), subject=t.get("subject"), body=t.get("body"))
+        title = t.get("title") or t.get("id") or ""
+        subject = t.get("subject") or ""
+        body = t.get("content") or t.get("body") or ""
+
+        tpl = Template(
+            title=title,
+            subject=subject,
+            body=body
+        )
         db.session.add(tpl)
+
     db.session.commit()
     print("Seeded templates:", len(data))
+
+
+# ------------------------------------------
+# Auto-run migrations on startup (free tier safe)
+# ------------------------------------------
 from flask_migrate import upgrade
 
 # Auto-run migrations on startup (only if database is empty)
 with app.app_context():
     try:
-        upgrade()
+        upgrade()   # <-- This defines "upgrade" correctly
         print("Database upgraded successfully.")
     except Exception as e:
         print(f"Migration skipped or failed: {e}")
+
+
 if __name__ == "__main__":
     app.run(debug=True)
