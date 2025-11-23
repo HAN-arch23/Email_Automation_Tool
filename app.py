@@ -208,7 +208,7 @@ def route_send():
 # Email Password (Keychain) UI
 # -------------------------
 from email_utils import get_stored_password
-import keyring
+
 
 @app.route("/email_password", methods=["GET", "POST"])
 @login_required
@@ -217,21 +217,29 @@ def email_password():
 
     if request.method == "POST":
         sender_email = request.form.get("sender_email")
-        sender_password = request.form.get("sender_password")
+    sender_password = request.form.get("sender_password")
 
-        if not sender_email or not sender_password:
-            message = "Missing email or password"
-        else:
-            try:
-                keyring.set_password("Email_Automation_Tool", sender_email, sender_password)
-                message = "Password saved successfully!"
-            except Exception as e:
-                message = f"Error: {str(e)}"
+    if not sender_email or not sender_password:
+        message = "Missing email or password"
+    else:
+        # Encrypt password and store it in a file
+        encrypted = encrypt_key(sender_password)
+
+        with open("email_password.txt", "w") as f:
+            f.write(json.dumps({
+                "sender_email": sender_email,
+                "encrypted_password": encrypted
+            }))
+
+        message = "Password saved successfully!"
+
 
     default_sender = os.getenv("DEFAULT_SENDER_EMAIL", "")
-    return render_template("email_password.html", default_sender=default_sender, message=message)
-
-
+    return render_template(
+        "email_password.html",
+        default_sender=default_sender,
+        message=message
+)
 # -------------------------
 # Auth routes + pages
 # -------------------------
