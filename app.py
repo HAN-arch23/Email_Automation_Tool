@@ -46,12 +46,23 @@ def load_user(user_id):
 TEMPLATES_PATH = os.path.join(os.path.dirname(__file__), "templates.json")
 
 def load_templates_file():
+    import json
+
     try:
-        with open("templates.json", "r") as f:
-            return json.load(f)
-    except Exception as e:
-        print("Error loading templates.json:", e)
+        with open("templates.json") as f:
+            data = json.load(f)
+    except:
         return []
+
+    # Insert into DB if not already present
+    for item in data:
+        existing = Template.query.filter_by(title=item.get("title")).first()
+        if not existing:
+            t = Template(title=item.get("title"), content=item.get("content"))
+            db.session.add(t)
+
+    db.session.commit()
+    return data
 
 
 
@@ -285,19 +296,13 @@ def logout():
 def index():
     templates = []
     db_count = Template.query.count()
-    if db_count:
-        templates = [{"id": str(t.id), "name": t.title} for t in Template.query.order_by(Template.created_at.desc()).all()]
-    else:
-        js = load_templates_file()
 
-# If js contains strings, convert them to dicts
-        templates = []
-        for t in js:
-            if isinstance(t, dict):
-                templates.append({"id": t.get("id"), "name": t.get("title")})
-        else:
-        # Fallback if t is a string
-            templates.append({"id": t, "name": t})
+    if db_count == 0:
+        js = load_templates_file()
+        templates = [{"id": str(i), "name": t.get("title")} for i, t in enumerate(js)]
+    else:
+        templates = [{"id": str(t.id), "name": t.title} for t in Template.query.all()]
+
     return render_template("index.html", templates=templates)
 
 
