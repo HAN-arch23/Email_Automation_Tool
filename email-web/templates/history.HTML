@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h4>Recent Activity</h4>
+<table class="table">
+  <thead>
+    <tr><th>When</th><th>To</th><th>Subject</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+      <tr>
+        <td>{{ item.created_at }}</td>
+        <td>{{ item.to_addr }}</td>
+        <td>{{ item.subject }}</td>
+        <td>{{ item.status }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

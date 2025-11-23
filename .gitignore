@@ -1,0 +1,9 @@
+.env
+venv/
+instance/
+__pycache__/
+*.sqlite3
+*.db
+credentials_google.json
+email-web/venv/
+email-web/__pycache__/

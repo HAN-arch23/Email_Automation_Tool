@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4" style="max-width: 1100px;">
+    <h2 class="mb-4">Email Automation</h2>
+
+    <div class="row">
+        <!-- LEFT PANEL -->
+        <div class="col-md-8">
+
+            <label>To:</label>
+            <input id="to" class="form-control mb-3" placeholder="recipient@example.com">
+
+            <label>Subject:</label>
+            <input id="subject" class="form-control mb-3" placeholder="Enter subject">
+
+            <label>Body:</label>
+
+            <!-- AI Suggestion box -->
+            <div id="aiSuggestionBox"
+                 style="display:none;
+                        background:#f8f9fa;
+                        border-left:4px solid #0d6efd;
+                        padding:10px;
+                        border-radius:4px;
+                        margin-bottom:10px;">
+                <strong>AI Suggestion:</strong>
+                <div id="aiSuggestionText" style="margin-top:5px;"></div>
+            </div>
+
+            <textarea id="body" rows="12" class="form-control mb-3"></textarea>
+
+            <button id="sendBtn" class="btn btn-primary">Send Email</button>
+            <a href="{{ url_for('history') }}" class="btn btn-secondary ms-2">History</a>
+
+        </div>
+
+
+        <!-- RIGHT PANEL -->
+        <div class="col-md-4">
+
+            <h5 class="mb-2">Templates</h5>
+
+            <select id="templateSelect" class="form-select mb-2">
+                <option value="">Select a template</option>
+                {% for t in templates %}
+                    <option value="{{ t.id }}">{{ t.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button id="applyTemplateBtn" class="btn btn-outline-primary btn-sm mb-3 w-100">
+                Apply Template
+            </button>
+
+            <hr>
+
+            <!-- AI Tools -->
+            <h5 class="mb-2">AI Tools</h5>
+
+            <button id="aiComplete" class="btn btn-outline-success btn-sm mb-2 w-100">
+                ✨ AI Auto-Complete
+            </button>
+
+            <button id="aiReply" class="btn btn-outline-info btn-sm mb-2 w-100">
+                💬 AI Auto-Reply
+            </button>
+
+            <button id="aiRewrite" class="btn btn-outline-dark btn-sm mb-2 w-100">
+                🔄 Rewrite Text
+            </button>
+
+            <button id="aiGrammar" class="btn btn-outline-warning btn-sm mb-3 w-100">
+                📝 Fix Grammar
+            </button>
+
+            <hr>
+
+            <!-- OPENAI KEY -->
+            <h5 class="mb-2">OpenAI Key</h5>
+            <input id="openaiKey" class="form-control mb-2" placeholder="sk-..." />
+            <button id="saveKey" class="btn btn-outline-secondary btn-sm w-100">
+                Save Key (encrypted)
+            </button>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- FULL FIXED JAVASCRIPT -->
+<script>
+
+/* -----------------------------
+   Apply Template
+------------------------------ */
+document.getElementById("applyTemplateBtn").onclick = async () => {
+    const id = document.getElementById("templateSelect").value;
+    if (!id) return alert("Pick a template");
+
+    const res = await fetch("/api/templates/" + id);
+    const t = await res.json();
+
+    document.getElementById("subject").value = t.subject;
+    document.getElementById("body").value = t.body;
+};
+
+
+/* -----------------------------
+   UNIVERSAL AI FUNCTION (FIXED)
+------------------------------ */
+async function callAI(route, textField, updateSuggestion = false) {
+
+    const text = document.getElementById(textField).value;
+
+    const res = await fetch(route, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ text })
+    });
+
+    const j = await res.json();
+
+    if (!j.ok) {
+        alert(j.error || "AI error");
+        return;
+    }
+
+    // Accept any field returned by backend
+    let result = j.text || j.reply || j.rewritten || j.fixed;
+
+    if (!result) {
+        result = "Error: No response.";
+    }
+
+    if (updateSuggestion) {
+        document.getElementById("aiSuggestionBox").style.display = "block";
+        document.getElementById("aiSuggestionText").innerText = result;
+    } else {
+        document.getElementById(textField).value = result;
+    }
+}
+
+
+/* -----------------------------
+   AI BUTTON HANDLERS
+------------------------------ */
+document.getElementById("aiComplete").onclick =
+    () => callAI("/ai/autocomplete", "body", true);
+
+document.getElementById("aiReply").onclick =
+    () => callAI("/ai/autoreply", "body");
+
+document.getElementById("aiRewrite").onclick =
+    () => callAI("/ai/rewrite", "body");
+
+document.getElementById("aiGrammar").onclick =
+    () => callAI("/ai/grammar", "body");
+
+
+/* -----------------------------
+   Save OpenAI Key
+------------------------------ */
+document.getElementById("saveKey").onclick = async () => {
+    const key = document.getElementById("openaiKey").value.trim();
+    if (!key) return alert("Enter key first");
+
+    const res = await fetch("/save_key", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: `openai_key=${encodeURIComponent(key)}`
+    });
+
+    const j = await res.json();
+    alert(j.ok ? "API key saved!" : j.msg);
+};
+
+
+/* -----------------------------
+   SEND EMAIL
+------------------------------ */
+document.getElementById("sendBtn").onclick = async () => {
+
+    const to = document.getElementById("to").value;
+    const subject = document.getElementById("subject").value;
+    const body = document.getElementById("body").value;
+
+    const res = await fetch("/send", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: `to=${encodeURIComponent(to)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    });
+
+    const j = await res.json();
+    alert(j.ok ? "Email sent!" : j.error);
+};
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "ticket_ack",
+    "title": "Ticket Acknowledgement",
+    "subject": "Ticket Acknowledgement – [Ticket ID]",
+    "body": "Dear [Client Name],\n\nThis is to acknowledge that we have received your request regarding [issue]. Our team is currently reviewing the matter, and we will keep you updated.\n\nKind regards,\n[Your Name]\nNTT DATA Support Team"
+  },
+  {
+    "id": "ticket_update",
+    "title": "Ticket Update",
+    "subject": "Ticket Update – [Ticket ID]",
+    "body": "Dear [Client Name],\n\nWe would like to provide an update regarding your ticket [Ticket ID]. Our team is actively working on the issue and has made progress.\n\nThank you for your patience.\n\nRegards,\n[Your Name]\nNTT DATA Support Team"
+  },
+  {
+    "id": "ticket_closure",
+    "title": "Ticket Closure Notice",
+    "subject": "Ticket Closure – [Ticket ID]",
+    "body": "Dear [Client Name],\n\nFollowing our recent communication, we can confirm that the service is now stable. We will proceed to close the ticket on our end.\n\nIf you need further assistance, please reach out.\n\nBest regards,\n[Your Name]\nNTT DATA Support Team"
+  },
+  {
+    "id": "incident_notification",
+    "title": "Incident Notification",
+    "subject": "Incident Notification – [Service/Location]",
+    "body": "Dear Team,\n\nPlease be informed that we are currently experiencing an incident affecting [service/location]. Our engineers are investigating.\n\nWe will provide updates soon.\n\nRegards,\nNTT DATA Support Team"
+  },
+  {
+    "id": "incident_resolved",
+    "title": "Incident Resolved",
+    "subject": "Incident Resolved – [Service/Location]",
+    "body": "Dear Team,\n\nThe incident affecting [service/location] has been resolved. All services are functioning normally.\n\nThank you for your patience.\n\nNTT DATA Support Team"
+  },
+  {
+    "id": "planned_maintenance",
+    "title": "Planned Maintenance Notification",
+    "subject": "Planned Maintenance – [Date & Time]",
+    "body": "Dear Customer,\n\nThis is to inform you of planned maintenance on [date and time]. You may experience intermittent service interruptions.\n\nThank you for your understanding.\n\nNTT DATA Support Team"
+  },
+  {
+    "id": "service_restoration",
+    "title": "Service Restoration Update",
+    "subject": "Service Restoration Update – [Service/Location]",
+    "body": "Dear [Client Name],\n\nServices are gradually being restored following the earlier outage. We continue to monitor the situation.\n\nBest regards,\nNTT DATA Support Team"
+  },
+  {
+    "id": "follow_up",
+    "title": "Follow-Up Email",
+    "subject": "Follow-Up on Your Request – [Ticket ID]",
+    "body": "Dear [Client Name],\n\nThis is a follow-up regarding your ticket [Ticket ID]. Kindly let us know if the issue has been resolved or if additional support is required.\n\nRegards,\n[Your Name]\nNTT DATA Support Team"
+  },
+  {
+    "id": "escalation_notice",
+    "title": "Escalation Notice",
+    "subject": "Ticket Escalation – [Ticket ID]",
+    "body": "Dear [Client Name],\n\nYour ticket [Ticket ID] has been escalated to our Tier 2/Tier 3 team for further analysis. We will keep you updated.\n\nRegards,\nNTT DATA Support Team"
+  },
+  {
+    "id": "monthly_report",
+    "title": "Monthly Service Report",
+    "subject": "Monthly Report – [Month]",
+    "body": "Dear [Client Name],\n\nPlease find attached the monthly service report for [Month]. Feel free to contact us if you need clarification.\n\nKind regards,\n[Your Name]\nNTT DATA Support Team"
+  }
+]
