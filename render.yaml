@@ -1,21 +1,6 @@
 services:
   - type: web
-    name: email-automation-web
+    name: Email_Automation_Tool
     env: python
-    buildCommand: ""
-    startCommand: gunicorn app:app
-    envVars:
-      - key: SECRET_KEY
-        sync: false
-      - key: DATABASE_URL
-        sync: false
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: MASTER_FERNET_KEY
-        sync: false
-      - key: DEFAULT_SENDER_EMAIL
-        sync: false
-      - key: SMTP_SERVER
-        sync: false
-      - key: SMTP_PORT
-        sync: false
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn email-web.app:app"
