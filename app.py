@@ -58,7 +58,7 @@ def load_templates_file():
     for item in data:
         existing = Template.query.filter_by(title=item.get("title")).first()
         if not existing:
-            t = Template(title=item.get("title"), content=item.get("content"))
+            t = Template(title=item.get("title"),subject=item.get("subject") or"",body=item.get("content") or item.get("body") or "" )
             db.session.add(t)
 
     db.session.commit()
