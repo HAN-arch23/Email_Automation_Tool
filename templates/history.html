@@ -1,19 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
-<h4>Recent Activity</h4>
-<table class="table">
-  <thead>
-    <tr><th>When</th><th>To</th><th>Subject</th><th>Status</th></tr>
-  </thead>
-  <tbody>
-    {% for item in items %}
-      <tr>
-        <td>{{ item.created_at }}</td>
-        <td>{{ item.to_addr }}</td>
-        <td>{{ item.subject }}</td>
-        <td>{{ item.status }}</td>
-      </tr>
-    {% endfor %}
-  </tbody>
-</table>
+
+<div class="card shadow-sm border-0">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="card-title mb-0">Recent Activity</h4>
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">Back to Composer</a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>When</th>
+            <th>To</th>
+            <th>Subject</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if items %}
+          {% for item in items %}
+          <tr>
+            <td>{{ item.created_at }}</td>
+            <td>{{ item.to_addr }}</td>
+            <td>{{ item.subject }}</td>
+            <td>
+              <span class="badge bg-success rounded-pill">Sent</span>
+            </td>
+          </tr>
+          {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="4" class="text-center py-4 text-muted">
+              No history found.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

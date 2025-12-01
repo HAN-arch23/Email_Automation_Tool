@@ -12,13 +12,15 @@ SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
 # NEW — read Gmail App Password
 EMAIL_PASSWORD = os.getenv("EMAIL_APP_PASSWORD", "").strip()
 
-def send_email_smtp(to_address: str, subject: str, body_text: str, sender: str = None):
+def send_email_smtp(to_address: str, subject: str, body_text: str, sender: str = None, password: str = None):
     sender = sender or SENDER_EMAIL
     if not sender:
         raise ValueError("No sender set in DEFAULT_SENDER_EMAIL")
 
-    if not EMAIL_PASSWORD:
-        raise ValueError("Missing EMAIL_APP_PASSWORD in environment variables")
+    # Use provided password or fallback to env var
+    final_password = password or EMAIL_PASSWORD
+    if not final_password:
+        raise ValueError("Missing password. Please provide it or set EMAIL_APP_PASSWORD.")
 
     msg = EmailMessage()
     msg["From"] = sender
@@ -29,5 +31,5 @@ def send_email_smtp(to_address: str, subject: str, body_text: str, sender: str =
     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as smtp:
         smtp.ehlo()
         smtp.starttls()
-        smtp.login(sender, EMAIL_PASSWORD)
+        smtp.login(sender, final_password)
         smtp.send_message(msg)

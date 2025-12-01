@@ -23,7 +23,9 @@ load_dotenv()
 app = Flask(__name__, template_folder="templates")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
 # DB path relative to app location: instance/app.db
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL") or os.getenv("SQLALCHEMY_DATABASE_URI") or "sqlite:///instance/app.db"
+if app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgres://"):
+    app.config["SQLALCHEMY_DATABASE_URI"] = app.config["SQLALCHEMY_DATABASE_URI"].replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # ensure instance folder exists
@@ -54,15 +56,27 @@ def load_templates_file():
     except:
         return []
 
-    # Insert into DB if not already present
+    cleaned = []
     for item in data:
-        existing = Template.query.filter_by(title=item.get("title")).first()
-        if not existing:
-            t = Template(title=item.get("title"),subject=item.get("subject") or"",body=item.get("content") or item.get("body") or "" )
-            db.session.add(t)
+        cleaned.append({
+            "title": item.get("title") or "",
+            "subject": item.get("subject") or "",
+            "body": item.get("body") or "",
+        })
+
+    # Insert into DB if not already present
+    for tpl in cleaned:
+        exists = Template.query.filter_by(title=tpl["title"]).first()
+        if not exists:
+            new_tpl = Template(
+                title=tpl["title"],
+                subject=tpl["subject"],
+                body=tpl["body"],
+            )
+            db.session.add(new_tpl)
 
     db.session.commit()
-    return data
+    return cleaned
 
 
 
@@ -205,12 +219,17 @@ def route_send():
         return jsonify({"ok": False, "error": "Missing recipient"}), 400
 
     try:
+        # Decrypt password if available
+        password = None
+        if current_user.email_enc_password:
+            password = decrypt_key(current_user.email_enc_password)
+
         send_email_smtp(
             to_address=to,
             subject=subject,
             body_text=body,
             sender=current_user.email,
-            enc_password=current_user.email_enc_password
+            password=password
         )
         return jsonify({"ok": True})
     except Exception as e:
@@ -219,7 +238,6 @@ def route_send():
 # -------------------------
 # Email Password (Keychain) UI
 # -------------------------
-
 @app.route("/email_password", methods=["GET", "POST"])
 @login_required
 def email_password():
@@ -227,29 +245,23 @@ def email_password():
 
     if request.method == "POST":
         sender_email = request.form.get("sender_email")
-    sender_password = request.form.get("sender_password")
+        sender_password = request.form.get("sender_password")   # ✅ INSIDE POST
 
-    if not sender_email or not sender_password:
-        message = "Missing email or password"
+        if not sender_email or not sender_password:
+            message = "Missing email or password"
+        else:
+            encrypted = encrypt_key(sender_password)
+            current_user.email_enc_password = encrypted
+            db.session.commit()
+            message = "Password saved successfully!"
     else:
-        # Encrypt password and store it in a file
-        encrypted = encrypt_key(sender_password)
-
-        with open("email_password.txt", "w") as f:
-            f.write(json.dumps({
-                "sender_email": sender_email,
-                "encrypted_password": encrypted
-            }))
-
-        message = "Password saved successfully!"
-
+        sender_email = None
+        sender_password = None
 
     default_sender = os.getenv("DEFAULT_SENDER_EMAIL", "")
-    return render_template(
-        "email_password.html",
-        default_sender=default_sender,
-        message=message
-)
+    return render_template("email_password.html", default_sender=default_sender, message=message)
+
+
 # -------------------------
 # Auth routes + pages
 # -------------------------
@@ -276,7 +288,7 @@ def register():
         existing = User.query.filter_by(email=email).first()
         if existing:
             return render_template("register.html", error="User exists")
-        user = User(email=email, password_hash=generate_password_hash(password))
+        user = User(email=email, password_hash=generate_password_hash(password, method='pbkdf2:sha256'))
         db.session.add(user)
         db.session.commit()
         login_user(user)
