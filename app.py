@@ -29,6 +29,13 @@ if app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgres://"):
     app.config["SQLALCHEMY_DATABASE_URI"] = app.config["SQLALCHEMY_DATABASE_URI"].replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+# Debug: Print DB URI (masked)
+db_uri = app.config["SQLALCHEMY_DATABASE_URI"]
+if db_uri:
+    masked_uri = db_uri.split("@")[-1] if "@" in db_uri else "sqlite/local"
+    print(f"🔌 Connecting to database: {masked_uri}")
+
+
 # ensure instance folder exists
 os.makedirs(os.path.join(app.root_path, "instance"), exist_ok=True)
 
