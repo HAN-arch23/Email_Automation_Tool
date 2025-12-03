@@ -9,3 +9,7 @@ __pycache__/
 credentials_google.json
 email-web/venv/
 email-web/__pycache__/
+*.pyc
+.DS_Store
+migrations/versions/*.pyc
+.flyctl
