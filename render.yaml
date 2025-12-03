@@ -1,7 +1,22 @@
 services:
   - type: web
-    name: Email_Automation_Tool
+    name: email-automation-tool
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: email-automation-db
+          property: connectionString
+
+databases:
+  - name: email-automation-db
+    databaseName: email_tool
+    user: email_user
+    plan: free
